@@ -52,4 +52,24 @@ The data in the csv format is stored in the these autocreated variables:
 * ConstraintsFile = /home/vsduser/vsdsynth/openMSP430_design_constraints.csv
 
 On Day 2, we also write the TCL stript to read the constraints csv file and calculate row numbers for Clock, input and Output Ports in the csv file by converting it to matrix and accessing it using ```lindex``` command. The row numbers are then stored in variables to process it later to create SDC format file.
+![constraints](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/constraints.png)
 ![calcrow](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/calcrow.png)
+
+##  Day 3: Processing Clock and Input Constraints
+The objective of day 3 was to automatically extract clock-related and input-related parameters from the constraints CSV and generate complete clock and input constraints in a newly created SDC file.
+
+For processing of **clock constraints**, an algorithm using ```search rect``` (Search for a value (pattern) inside a rectangular region of the matrix, defined by start and end column and row indices.) was implemented to identify the column indices corresponding to clock latency and clock transition parameters (early/late, rise/fall). Using matrix search operations, the script dynamically located these constraint fields.
+
+All clock-related constraints were written sequentially into the SDC file by creating and opening it in write (w) mode one by one automatically.
+![clock1](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/clock1.png)
+
+For processing of **input constraints**, first of all special emphasis was given on differentiating between scalar (bit) inputs and bussed inputs.The task began with identifying the relevant constraint columns for input delays and input transitions from the constraints CSV similarly like it is done for clock constraints.
+The main steps include after identifying input constraints in csv file are:
+1. Using pattern matching and regular expressions ```regexp``` to identify input declarations.
+2. Normalizing whitespace using regular substitution ```\S+``` to create fixed-space strings.
+3. Reading, splitting, uniquifying, sorting, and joining input port names to eliminate duplication.
+4. Evaluating string length to Distinguish between single-bit ports and bus ports.
+5. Concatenate '*' at the end of the bus input port to distinguish them. 
+
+These ports which are distinguised and stored are then used to add the input constaints in the SDC file.
+![input1](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/input1.png)
