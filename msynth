@@ -1,0 +1,52 @@
+#!/bin/tcsh -f
+echo "\n"
+echo "     	  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+echo "     	                                                                                "
+echo "     	          ##     ##  #######  ###     ###  ###    ##  ########  ##     ##       "
+echo "     	          ###   ###  ##        ###   ###   ####   ##     ##     ##     ##       "
+echo "     	          #### ####  #######    ### ###    ## ##  ##     ##     #########       "
+echo "     	          ## ### ##       ##      ###      ##  ## ##     ##     ##     ##       "
+echo "     	          ##     ##  #######      ###      ##   ####     ##     ##     ##       "
+echo "     	                                                                                "
+echo "     	  XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+
+echo 
+echo "       This is an open-source automation tool that generates synthesized netlist and pre-layout" 
+echo "                 timing report by taking the RTL netlist and SDC constraints as input."
+echo "                        It uses Yosys and OpenTimer free open-source tools"
+echo " "
+echo "                       It is developed and maintained by Manash Jyoti Barman\n"
+
+set my_work_dir = 'pwd'
+
+# Checking if  CSV file is provided or not
+if($#argv != 1) then
+echo "Info: Please provide the csv file"
+exit 1
+endif
+
+# Checking if the provided file exists or help message
+if(! -f $argv[1] || $argv[1] == "-help") then
+	if($argv[1] != "-help") then
+		echo "Error: cannot find csv file $argv[1]. Exiting..."
+		exit 1
+	else
+		echo USAGE: ./vsdsynth \<csv file\>
+		echo where  \<csv file\> consists of 2 columns
+		echo \<Design name\> is the name of the top module
+		echo \<Output Directoty\> is the name of the output directory where we want to dump synthesis script, synthesized netlist and timing reports
+		echo \<Netlist Directory\> is the name of directory where all the RTL netlists are present
+		echo \<Early Library path\> is the file path of the early cell library to be used for STA
+		echo \<Late Library path\> is the file path of the late cell library to be used for STA
+		echo \<Constraints file\> is csv file path of the constraints to be used for STA
+		echo
+		exit 1
+	endif
+
+else
+	tclsh msynth.tcl $argv[1]
+endif
+
+
+
+
