@@ -84,3 +84,15 @@ For processing of **output constraints**, same algorithm and methods were used a
 The SDC file generated ```openMSP430.sdc``` looks like:
 ![SDC_file](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/sdcfile.png)
 
+A dedicated Yosys script was automatically generated using TCL to:
+1. Read the standard cell library
+2. Read all RTL netlist files
+3. Perform a hierarchy check to detect missing or undefined modules
+
+The TCL script then executed this hierarchy check and captured the output log. Error handling logic was implemented to detect hierarchy-related failures by parsing the Yosys log file. 
+* If missing module references were found, the script reported clear, user-friendly error message FAIL indicating the problematic or missing module and RTL path.
+![FAIL](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/hierarchyFAIL.png)
+Below is the Error Message highlighted in the hierarchy check log file which is used by the TCL script.
+![Error_log](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/hierarchylog.png)
+* If no errors were detected, the hierarchy check was marked as successful displaying PASS message.
+![PASS](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/hierarchyPASS.png)
