@@ -73,3 +73,14 @@ The main steps include after identifying input constraints in csv file are:
 
 These ports which are distinguised and stored are then used to add the input constaints in the SDC file.
 ![input1](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/input1.png)
+
+## Day 4: Complete Scripting and Yosys Synthesis Introduction
+On Day 4 of the workshop SDC file generation is completed by output constraint generation. This SDC file is passed to synthesis tools along with some other files for synthesis. Integration of the open source synthesis tool **Yosys** is integrated with the TCL box.
+
+The session was divided into three major parts: output constraint generation, hierarchy check with error handling.
+
+For processing of **output constraints**, same algorithm and methods were used as we used in processing of input constraints.
+![output1](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/output1.png)
+The SDC file generated ```openMSP430.sdc``` looks like:
+![SDC_file](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/sdcfile.png)
+
