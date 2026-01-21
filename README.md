@@ -117,4 +117,4 @@ After the yosys script file is ready we write the TCL script to execute this scr
 
 The above synthesized netlist is further used in Timing analysis but with some modifictions. First of all the '\' are removed from the synthesized netlist and a final synthesized netlist is created.
 ![convert](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/convert.png)
-![final_syntheized_netlist](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/synthfinal.png)
+![final_syntheized_netlist](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/finalsynth.png)
