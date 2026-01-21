@@ -96,3 +96,25 @@ Below is the Error Message highlighted in the hierarchy check log file which is 
 ![Error_log](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/hierarchylog.png)
 * If no errors were detected, the hierarchy check was marked as successful displaying PASS message.
 ![PASS](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/hierarchyPASS.png)
+
+## Day 5: Final Flow Automation and QoR Generation
+Day 5 is the stage where all parts of the VSDSYNTH TCL Box comes together. The main goal of this day was to automate the complete design flow using TCL, starting from design inputs and ending with timing results and quality metrics.
+
+The TCL script now acts as a controller, which means it automatically runs each tool in the correct order and passes the required data from one stage to the next.
+
+The complete automated flow implemented on Day 5 follows this sequence:
+
+CSV Inputs → SDC Generation → Yosys Synthesis → OpenTimer → QoR Report
+
+Generation of SDC file is completed. So, on the very start of Day 5 we run synthesis using Yosys tool. 
+
+For **Synthesis**, we write write the TCL script to automate the generation of a Yosys script which then takes the RTL Verilog code and lib files and generates a synthesized gate-level netlist. 
+![synthesis_script_generation](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/synscript.png)
+![yosys_script](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/yscript.png)
+After the yosys script file is ready we write the TCL script to execute this script file by Yosys tool to obtain the synthesized netlist. All the details of the process are stored in the synthesis log file:
+![synthesis](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/synthsuccess.png)
+![synthesis log](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/synthlog.png)
+
+The above synthesized netlist is further used in Timing analysis but with some modifictions. First of all the '\' are removed from the synthesized netlist and a final synthesized netlist is created.
+![convert](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/convert.png)
+![final_syntheized_netlist](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/synthfinal.png)
