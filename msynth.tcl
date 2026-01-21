@@ -301,7 +301,7 @@ set fileId [open $OutputDirectory/$filename "w"]
 puts -nonewline $fileId $data
 set netlist [glob -dir $NetlistDirectory *.v]
 foreach f $netlist {
-puts -nonewline $fileId "\nread_verilog $f"
+	puts -nonewline $fileId "\nread_verilog $f"
 }
 puts -nonewline $fileId "\nhierarchy -top $DesignName"
 puts -nonewline $fileId "\nsynth -top $DesignName"
@@ -316,10 +316,10 @@ puts "\nInfo: Synthesis Script created and can be accessed from path $OutputDire
 #Running main synthesis in yosys
 puts "\nInfo: Running Synthesis....."
 if [catch {exec yosys -s $OutputDirectory/$DesignName.ys >& $OutputDirectory/$DesignName.synthesis.log} msg] {
-puts "\nError: Synthesis failed due to errors"
-exit
+	puts "\nError: Synthesis failed due to errors"
+	exit
 } else {
-puts "\nInfo: Synthesis finished Successfully."
+	puts "\nInfo: Synthesis finished Successfully."
 }
 puts "\nInfo: Please refer to log at $OutputDirectory/$DesignName.synthesis.log"
 
@@ -331,8 +331,8 @@ set output [open $OutputDirectory/$DesignName.final.synth.v "w"]
 set filename "/tmp/1"
 set fid [open $filename r]
 while { [gets $fid line] != -1} {
-puts -nonewline $output [string map {"\\" ""} $line]
-puts -nonewline $output "\n"
+	puts -nonewline $output [string map {"\\" ""} $line]
+	puts -nonewline $output "\n"
 }
 close $fid
 close $output
@@ -358,4 +358,147 @@ read_verilog $OutputDirectory/$DesignName.final.synth.v
 read_sdc $OutputDirectory/$DesignName.sdc
 reopenStdout /dev/tty
 
-return
+#Creating the .spef file
+set enable_prelayout_timing 1
+puts "\nInfo: Setting enable_prelayout_timing as $enable_prelayout_timing to write default .spef with zero-wire load parasitics since, actual .spef is not available. For user debug."
+if {$enable_prelayout_timing == 1} {
+	puts "\nInfo: enable_prelayout_timing is $enable_prelayout_timing. Enabling zero-wire load parasitics"
+	set spef_file [open $OutputDirectory/$DesignName.spef w]
+	puts $spef_file "*SPEF \"IEEE 1481-1998\" "
+	puts $spef_file "*DESIGN \"$DesignName\" "
+	puts $spef_file "*DATE \"[clock format [clock seconds] -format {%a %b %d %I:%M:%S %Y}]\" "
+	puts $spef_file "*VENDOR \"TAU 2015 Contest\" "
+	puts $spef_file "*PROGRAM \"Benchmark Parasitic Generator\" "
+	puts $spef_file "*VERSION \"0.0\" "
+	puts $spef_file "*DESIGN_FLOW \"NETLIST_TYPE_VERILOG\" "
+	puts $spef_file "*DIVIDER / "
+	puts $spef_file "*DELIMITER : "
+	puts $spef_file "*BUS_DELIMITER \[ \] "
+	puts $spef_file "*T_UNIT 1 PS "
+	puts $spef_file "*C_UNIT 1 FF "
+	puts $spef_file "*R_UNIT 1 KOHM "
+	puts $spef_file "*L_UNIT 1 UH "
+	close $spef_file
+}
+
+# Appending to .conf file
+puts "Info: Appending rest of the required commands to .conf file. For user debug."
+set conf_file [open $OutputDirectory/$DesignName.conf a]
+puts $conf_file "set_spef_fpath $OutputDirectory/$DesignName.spef"
+puts $conf_file "init_timer "
+puts $conf_file "report_timer "
+puts $conf_file "report_wns "
+puts $conf_file "report_worst_paths -numPaths 10000 "
+close $conf_file
+puts "      Entering STA analysis using OpenTimer"
+
+#Running STA on OpenTimer dumping log to .results file
+set tcl_precision 3
+set time_elapsed_in_us [time {exec /home/vsduser/OpenTimer-1.0.5/bin/OpenTimer < $OutputDirectory/$DesignName.conf >& $OutputDirectory/$DesignName.results}]
+set time_elapsed_in_sec "[expr {[lindex $time_elapsed_in_us 0]/1000000.0}]sec"
+puts "\nInfo: STA finished in $time_elapsed_in_sec seconds"
+puts "\nInfo: For Warnings and Errors, refer to $OutputDirectory/$DesignName.results "
+
+
+#Finding worst output violation(RAT)
+set worst_RAT_slack "-"
+set report_file [open $OutputDirectory/$DesignName.results r]
+set pattern {RAT}
+while { [gets $report_file line] != -1} {
+	if {[regexp $pattern $line]} {
+		set worst_RAT_slack "[expr {[lindex $line 3]/1000}]ns"
+		break
+	} else {
+		continue
+	}
+}
+close $report_file
+puts "Worst RAT Slack = $worst_RAT_slack"
+
+#Finding number of output violations
+set report_file [open $OutputDirectory/$DesignName.results r]
+set count 0
+while { [gets $report_file line] != -1} {
+	incr count [regexp -all -- $pattern $line]
+}
+set num_output_violations $count
+close $report_file
+puts "Number of Output Violations = $num_output_violations"
+
+#Finding worst setup violation
+set worst_negative_setup_slack "-"
+set report_file [open $OutputDirectory/$DesignName.results r]
+set pattern {Setup}
+while { [gets $report_file line]!= -1} {
+	if {[regexp $pattern $line]} {
+		set worst_negative_setup_slack "[expr {[lindex $line 3]/1000}]ns"
+		break
+	} else {
+		continue
+	}
+}
+close $report_file
+puts "Worst Negative Setup Slack = $worst_negative_setup_slack"
+
+#Finding number of Setup violations
+set report_file [open $OutputDirectory/$DesignName.results r]
+set count 0
+while { [gets $report_file line]  != -1} {
+	incr count [regexp -all -- $pattern $line]
+}
+set number_of_setup_violations $count
+close $report_file
+puts "Number of Setup Vioations = $number_of_setup_violations"
+
+#Finding worst Hold violations
+set worst_negative_Hold_slack "-"
+set report_file [open $OutputDirectory/$DesignName.results r]
+set pattern {Hold}
+while { [gets $report_file line] != -1} {
+	if {[regexp $pattern $line]} {
+		set worst_negative_Hold_slack "[expr {[lindex $line 3]/1000}]ns"
+		break
+	} else {
+		continue
+	}
+}
+close $report_file
+puts "Worst Negative Hold Slack = $worst_negative_Hold_slack"
+
+#Finding number of Hold violations
+set report_file [open $OutputDirectory/$DesignName.results r]
+set count 0
+while { [gets $report_file line] != -1} {
+	incr count [regexp -all -- $pattern $line]
+}
+set number_of_Hold_violations $count
+close $report_file 
+puts "Number of Hold Violations = $number_of_Hold_violations"
+
+#Finding number of instances
+set pattern {Num of gates}
+set report_file [open $OutputDirectory/$DesignName.results r]
+while { [gets $report_file line] != -1} {
+	if {[regexp -all -- $pattern $line]} {
+		set instance_count [lindex [join $line " "] 4 ]
+		puts "$instance_count"
+		break
+	} else {
+		continue
+	}
+}
+close $report_file
+puts "Instance count = $instance_count"
+
+# Quality of Results (QoR) generation
+puts "\n"
+puts "                                                           ****PRELAYOUT TIMING RESULTS****\n"
+set formatStr {%15s%14s%21s%16s%16s%15s%15s%15s%15s}
+puts [format $formatStr "-----------" "-------" "--------------" "---------" "---------" "--------" "--------" "-------" "-------"]
+puts [format $formatStr "Design Name" "Runtime" "Instance Count" "WNS Setup" "FEP Setup" "WNS Hold" "FEP Hold" "WNS RAT" "FEP RAT"]
+puts [format $formatStr "-----------" "-------" "--------------" "---------" "---------" "--------" "--------" "-------" "-------"]
+foreach design_name $DesignName runtime $time_elapsed_in_sec instance_count $instance_count wns_setup $worst_negative_setup_slack fep_setup $number_of_setup_violations wns_hold $worst_negative_Hold_slack fep_hold $number_of_Hold_violations wns_rat $worst_RAT_slack fep_rat $num_output_violations {
+	puts [format $formatStr $design_name $runtime $instance_count $wns_setup $fep_setup $wns_hold $fep_hold $wns_rat $fep_rat]
+}
+puts [format $formatStr "-----------" "-------" "--------------" "---------" "---------" "--------" "--------" "-------" "-------"]
+puts "\n"
