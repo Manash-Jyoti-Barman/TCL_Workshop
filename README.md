@@ -115,6 +115,27 @@ After the yosys script file is ready we write the TCL script to execute this scr
 ![synthesis](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/synthsuccess.png)
 ![synthesis log](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/synthlog.png)
 
-The above synthesized netlist is further used in Timing analysis but with some modifictions. First of all the '\' are removed from the synthesized netlist and a final synthesized netlist is created.
+The above synthesized netlist is further used in Timing analysis but with some modifictions. First of all the escape characters '\' are removed from the synthesized netlist and a final synthesized netlist is created.
 ![convert](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/convert.png)
 ![final_syntheized_netlist](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/finalsynth.png)
+
+To keep the script clean and easy to manage, TCL procedures (procs) were used. Procs were written to:
+* Redirecting standard output to configuration files
+* Setting multi-CPU usage
+* Reading libraries, netlists, and SDC files
+The procs file created are stored in a separate procs folder in the working directory.
+![procs_files](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/procs.png)
+For **Static Timing Analysis** with OpenTimer, the TCL script was written to automatically create the required OpenTimer configuration file (```.conf```) and Standard Parasitic Exchange Format file(```.spef```). The chip has not been placed or routed so real wire lengths and parasitics are unknown. A real SPEF file cannot be generated. That is why we Created a default SPEF file assuming zero wire resistance and capacitance. Uses it only for early timing checks and debugging.
+![spef](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/spef.png)
+An OpenTimer configuration file created automatically by TCL scripting is shown:
+![conf](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/conf.png)
+Then OpenTimer was then run directly from the TCL script to perform static timing analysis.
+![STA processing](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/STA2.png)
+After completing STA, the TCL script parsed OpenTimer reports to extract the following key **Quality of Results (QoR)** metrics:
+* Runtime
+* Instance count
+* Worst Negative Slack (WNS) for setup, hold, and reg-to-output (RAT)
+* Failing End Points (FEP) counts
+![STA complete](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/STAfinish.png)
+The ```Quality of Results (QoR)``` metrics were formatted into a clean, tabular summary, providing a quick and clear view of the design’s timing quality using formatted strings in TCL script.
+![QoR](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/qortable.png)
