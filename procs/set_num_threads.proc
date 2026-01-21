@@ -1,4 +1,4 @@
-proc set_multi_cpu_usage {args} {
+proc set_num_threads {args} {
         array set options {-localCpu <num_of_threads> -help "" }
         #foreach {switch value} [array get options] {
         #puts "Option $switch is $value"
