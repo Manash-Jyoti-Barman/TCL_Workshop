@@ -130,9 +130,11 @@ For **Static Timing Analysis** with OpenTimer, the TCL script was written to aut
 ![spef](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/spef.png)
 
 An OpenTimer configuration file created automatically by TCL scripting is shown:
+
 ![conf](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/conf.png)
 
 Then OpenTimer was then run directly from the TCL script to perform static timing analysis.
+
 ![STA processing](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/STA2.png)
 
 After completing STA, the TCL script parsed OpenTimer reports to extract the following key **Quality of Results (QoR)** metrics:
@@ -140,6 +142,7 @@ After completing STA, the TCL script parsed OpenTimer reports to extract the fol
 * Instance count
 * Worst Negative Slack (WNS) for setup, hold, and reg-to-output (RAT)
 * Failing End Points (FEP) counts
+* 
 ![STA complete](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/STAfinish.png)
 
 The ```Quality of Results (QoR)``` metrics were formatted into a clean, tabular summary, providing a quick and clear view of the design’s timing quality using formatted strings in TCL script.
