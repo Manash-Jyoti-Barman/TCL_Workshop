@@ -138,4 +138,4 @@ After completing STA, the TCL script parsed OpenTimer reports to extract the fol
 * Failing End Points (FEP) counts
 ![STA complete](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/STAfinish.png)
 The ```Quality of Results (QoR)``` metrics were formatted into a clean, tabular summary, providing a quick and clear view of the design’s timing quality using formatted strings in TCL script.
-![QoR](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/qortable.png)
+![QoR](https://github.com/Manash-Jyoti-Barman/TCL_Workshop/blob/main/Assets/qor.png)
